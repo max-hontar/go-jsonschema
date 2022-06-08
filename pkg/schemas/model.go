@@ -118,6 +118,7 @@ type Type struct {
 	OneOf                []*Type          `json:"oneOf,omitempty"`                // section 5.24
 	Not                  *Type            `json:"not,omitempty"`                  // section 5.25
 	Definitions          Definitions      `json:"definitions,omitempty"`          // section 5.26
+	Examples             []interface{}    `json:"examples,omitempty"`
 	// RFC draft-wright-json-schema-validation-00, section 6, 7
 	Title       string      `json:"title,omitempty"`       // section 6.1
 	Description string      `json:"description,omitempty"` // section 6.1

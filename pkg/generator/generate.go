@@ -23,6 +23,7 @@ type Config struct {
 	DefaultPackageName string
 	DefaultOutputName  string
 	Warner             func(string)
+	Swagger            bool
 }
 
 type SchemaMapping struct {
@@ -631,6 +632,10 @@ func (g *schemaGenerator) generateStructType(
 			structField.Tags = fmt.Sprintf(`json:"%s,omitempty"`, name)
 		}
 
+		if g.config.Swagger {
+			structField.Tags += g.addSwaggerTags(name, prop, isRequired)
+		}
+
 		if structField.Comment == "" {
 			structField.Comment = fmt.Sprintf("%s corresponds to the JSON schema field %q.",
 				structField.Name, name)
@@ -656,6 +661,29 @@ func (g *schemaGenerator) generateStructType(
 		structType.AddField(structField)
 	}
 	return &structType, nil
+}
+
+func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequired bool) string {
+	var tags string
+	if isRequired {
+		tags += ` validate:"required"`
+	}
+	if prop != nil {
+		schemaType := *prop
+		if schemaType.MinLength != 0 {
+			tags += fmt.Sprintf(` minLength:"%d"`, schemaType.MinLength)
+		}
+		examples := g.schema.Examples
+		if len(examples) > 0 {
+			ex, ok := examples[0].(map[string]interface{})
+			if ok {
+				if val, ok := ex[name]; ok {
+					tags += fmt.Sprintf(` example:"%v"`, val)
+				}
+			}
+		}
+	}
+	return tags
 }
 
 func (g *schemaGenerator) generateTypeInline(

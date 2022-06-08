@@ -13,6 +13,7 @@ import (
 
 var (
 	verbose           bool
+	swagger           bool
 	defaultPackage    string
 	defaultOutput     string
 	schemaPackages    []string
@@ -60,6 +61,7 @@ var rootCmd = &cobra.Command{
 			SchemaMappings:     []generator.SchemaMapping{},
 			ResolveExtensions:  resolveExtensions,
 			YAMLExtensions:     yamlExtensions,
+			Swagger:            swagger,
 		}
 		for _, id := range allKeys(schemaPackageMap, schemaOutputMap, schemaRootTypeMap) {
 			mapping := generator.SchemaMapping{SchemaID: id}
@@ -120,6 +122,8 @@ var rootCmd = &cobra.Command{
 func main() {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false,
 		"Verbose output")
+	rootCmd.PersistentFlags().BoolVarP(&swagger, "swagger", "s", false,
+		"Add swagger tags")
 	rootCmd.PersistentFlags().StringVarP(&defaultPackage, "package", "p", "",
 		`Default name of package to declare Go files under, unless overridden with
 --schema-package`)

@@ -74,6 +74,12 @@ func TestCapitalization(t *testing.T) {
 	testExampleFile(t, cfg, "./data/misc/capitalization.json")
 }
 
+func TestCustomSchema(t *testing.T) {
+	cfg := basicConfig
+	cfg.Swagger = true
+	testExamples(t, cfg, "./data/custom")
+}
+
 func testExamples(t *testing.T, cfg generator.Config, dataDir string) {
 	fileInfos, err := ioutil.ReadDir(dataDir)
 	if err != nil {
@@ -111,7 +117,7 @@ func testExampleFile(t *testing.T, cfg generator.Config, fileName string) {
 			if outputName == "-" {
 				outputName = strings.TrimSuffix(filepath.Base(fileName), ".json") + ".go"
 			}
-			outputName += ".output"
+			//outputName += ".output"
 
 			goldenFileName := filepath.Join(filepath.Dir(fileName), outputName)
 			t.Logf("Using golden data in %s", mustAbs(goldenFileName))
