@@ -77,6 +77,10 @@ func TestCapitalization(t *testing.T) {
 func TestCustomSchema(t *testing.T) {
 	cfg := basicConfig
 	cfg.Swagger = true
+	cfg.DefaultPackageName = "http"
+	if err := removeFiles("./data/custom/*.go"); err != nil {
+		fmt.Println(err)
+	}
 	testExamples(t, cfg, "./data/custom")
 }
 
@@ -202,4 +206,17 @@ func mustAbs(s string) string {
 		panic(err)
 	}
 	return result
+}
+
+func removeFiles(name string) error {
+	files, err := filepath.Glob(name)
+	if err != nil {
+		return err
+	}
+	for _, f := range files {
+		if err := os.Remove(f); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -682,7 +682,7 @@ func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequ
 				enumString += fmt.Sprint(v)
 			}
 			if len(enumString) > 0 {
-				tags += fmt.Sprintf(` enum:"%s"`, enumString)
+				tags += fmt.Sprintf(` enums:"%s"`, enumString)
 			}
 		}
 		examples := g.schema.Examples
@@ -693,6 +693,8 @@ func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequ
 					switch v := val.(type) {
 					case map[string]interface{}:
 						break
+					case float64:
+						tags += fmt.Sprintf(` example:"%v"`, strings.Trim(fmt.Sprintf("%f", v), "0."))
 					default:
 						tags += fmt.Sprintf(` example:"%v"`, v)
 					}
