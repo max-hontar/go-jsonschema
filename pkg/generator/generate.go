@@ -673,12 +673,29 @@ func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequ
 		if schemaType.MinLength != 0 {
 			tags += fmt.Sprintf(` minLength:"%d"`, schemaType.MinLength)
 		}
+		if schemaType.Enum != nil {
+			var enumString string
+			for i, v := range schemaType.Enum {
+				if i > 0 {
+					enumString += ","
+				}
+				enumString += fmt.Sprint(v)
+			}
+			if len(enumString) > 0 {
+				tags += fmt.Sprintf(` enum:"%s"`, enumString)
+			}
+		}
 		examples := g.schema.Examples
 		if len(examples) > 0 {
 			ex, ok := examples[0].(map[string]interface{})
 			if ok {
 				if val, ok := ex[name]; ok {
-					tags += fmt.Sprintf(` example:"%v"`, val)
+					switch v := val.(type) {
+					case map[string]interface{}:
+						break
+					default:
+						tags += fmt.Sprintf(` example:"%v"`, v)
+					}
 				}
 			}
 		}
