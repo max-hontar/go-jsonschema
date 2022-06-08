@@ -286,6 +286,18 @@ func (g *schemaGenerator) generateRootType() error {
 
 	for _, name := range sortDefinitionsByName(g.schema.Definitions) {
 		def := g.schema.Definitions[name]
+
+		for propName, typ := range g.schema.Properties {
+			if typ.Items != nil && (strings.HasSuffix(typ.Items.Ref, name) || strings.HasSuffix(typ.Ref, name)) {
+				if example, ok := g.schema.Examples[0].(map[string]interface{}); ok {
+					if ex, ok := example[propName]; ok {
+						def.Examples = ex.([]interface{})
+					}
+				}
+				break
+			}
+		}
+
 		_, err := g.generateDeclaredType(def, newNameScope(g.identifierize(name)))
 		if err != nil {
 			return err
@@ -633,7 +645,7 @@ func (g *schemaGenerator) generateStructType(
 		}
 
 		if g.config.Swagger {
-			structField.Tags += g.addSwaggerTags(name, prop, isRequired)
+			structField.Tags += g.addSwaggerTags(name, prop, isRequired, t.Examples)
 		}
 
 		if structField.Comment == "" {
@@ -663,7 +675,7 @@ func (g *schemaGenerator) generateStructType(
 	return &structType, nil
 }
 
-func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequired bool) string {
+func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequired bool, examples interface{}) string {
 	var tags string
 	if isRequired {
 		tags += ` validate:"required"`
@@ -685,9 +697,9 @@ func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequ
 				tags += fmt.Sprintf(` enums:"%s"`, enumString)
 			}
 		}
-		examples := g.schema.Examples
-		if len(examples) > 0 {
-			ex, ok := examples[0].(map[string]interface{})
+		ex := examples.([]interface{})
+		if len(ex) > 0 {
+			ex, ok := ex[0].(map[string]interface{})
 			if ok {
 				if val, ok := ex[name]; ok {
 					switch v := val.(type) {
