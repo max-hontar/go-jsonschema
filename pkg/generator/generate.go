@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sanity-io/litter"
 
-	"github.com/atombender/go-jsonschema/pkg/codegen"
-	"github.com/atombender/go-jsonschema/pkg/schemas"
+	"github.com/max-hontar/go-jsonschema/pkg/codegen"
+	"github.com/max-hontar/go-jsonschema/pkg/schemas"
 )
 
 type Config struct {
@@ -288,7 +288,8 @@ func (g *schemaGenerator) generateRootType() error {
 		def := g.schema.Definitions[name]
 
 		for propName, typ := range g.schema.Properties {
-			if typ.Items != nil && strings.HasSuffix(typ.Items.Ref, name) || strings.HasSuffix(typ.Ref, name) {
+			if (typ.Items != nil && strings.HasSuffix(typ.Items.Ref, name) || strings.HasSuffix(typ.Ref, name)) &&
+				len(g.schema.Examples) > 0 {
 				if example, ok := g.schema.Examples[0].(map[string]interface{}); ok {
 					if ex, ok := example[propName]; ok {
 						if exi, ok := ex.([]interface{}); ok {

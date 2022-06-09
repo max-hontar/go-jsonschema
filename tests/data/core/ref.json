@@ -4,10 +4,10 @@
   "type": "object",
   "properties": {
     "myThing": {
-      "$ref": "#/Definitions/Thing"
+      "$ref": "#/definitions/Thing"
     },
     "myThing2": {
-      "$ref": "#/Definitions/Thing"
+      "$ref": "#/definitions/Thing"
     }
   },
   "definitions": {

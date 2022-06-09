@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/atombender/go-jsonschema/pkg/generator"
+	"github.com/max-hontar/go-jsonschema/pkg/generator"
 )
 
 var basicConfig = generator.Config{
@@ -121,7 +121,7 @@ func testExampleFile(t *testing.T, cfg generator.Config, fileName string) {
 			if outputName == "-" {
 				outputName = strings.TrimSuffix(filepath.Base(fileName), ".json") + ".go"
 			}
-			//outputName += ".output"
+			outputName += ".output"
 
 			goldenFileName := filepath.Join(filepath.Dir(fileName), outputName)
 			t.Logf("Using golden data in %s", mustAbs(goldenFileName))

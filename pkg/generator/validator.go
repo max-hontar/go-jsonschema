@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/atombender/go-jsonschema/pkg/codegen"
+	"github.com/max-hontar/go-jsonschema/pkg/codegen"
 )
 
 type validator interface {
