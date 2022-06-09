@@ -713,6 +713,10 @@ func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequ
 						tags += fmt.Sprintf(` example:"%v"`, strings.Trim(fmt.Sprintf("%f", v), "0."))
 					case []interface{}:
 						if len(v) > 0 {
+							vType := fmt.Sprintf("%T", v[0])
+							if vType == fmt.Sprintf("%T", map[string]interface{}{}) {
+								break
+							}
 							arr := fmt.Sprint(v[0])
 							for i := 1; i < len(v); i++ {
 								arr += "," + fmt.Sprint(v[i])
