@@ -78,7 +78,8 @@ func TestCustomSchema(t *testing.T) {
 	cfg := basicConfig
 	cfg.Swagger = true
 	cfg.DefaultPackageName = "http"
-	if err := removeFiles("./data/custom/*.go"); err != nil {
+	cfg.Wrapper = "PlaintextMessageRequestJson"
+	if err := removeFiles("./data/custom/*.go*"); err != nil {
 		fmt.Println(err)
 	}
 	testExamples(t, cfg, "./data/custom")

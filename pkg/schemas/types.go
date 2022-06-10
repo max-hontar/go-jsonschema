@@ -8,11 +8,13 @@ const (
 	TypeNameObject  = "object"
 	TypeNameBoolean = "boolean"
 	TypeNameNull    = "null"
+	TypeNameParent  = "parent"
+	TypeNameNested  = "nested"
 )
 
 func IsPrimitiveType(t string) bool {
 	switch t {
-	case TypeNameString, TypeNameNumber, TypeNameInteger, TypeNameBoolean, TypeNameNull:
+	case TypeNameString, TypeNameNumber, TypeNameInteger, TypeNameBoolean, TypeNameNull, TypeNameParent:
 		return true
 	default:
 		return false

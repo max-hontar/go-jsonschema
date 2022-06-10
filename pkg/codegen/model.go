@@ -270,6 +270,24 @@ func (EmptyInterfaceType) Generate(out *Emitter) {
 	out.Print("interface{}")
 }
 
+type ParentType struct{}
+
+func (ParentType) IsNillable() bool { return true }
+
+func (ParentType) Generate(out *Emitter) {
+	out.Print("")
+}
+
+type NestedType struct {
+	TypeName string
+}
+
+func (NestedType) IsNillable() bool { return true }
+
+func (n NestedType) Generate(out *Emitter) {
+	out.Print(n.TypeName)
+}
+
 type NullType struct{}
 
 func (NullType) IsNillable() bool { return true }

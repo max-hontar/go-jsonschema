@@ -32,6 +32,7 @@ type Schema struct {
 	*Type
 	ID          string      `json:"$id"` // RFC draft-wright-json-schema-01, section-9.2
 	LegacyID    string      `json:"id"`  // RFC draft-wright-json-schema-00, section 4.5
+	Comment     string      `json:"$comment"`
 	Definitions Definitions `json:"definitions,omitempty"`
 }
 

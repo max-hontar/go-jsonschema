@@ -15,6 +15,8 @@ import (
 	"github.com/max-hontar/go-jsonschema/pkg/schemas"
 )
 
+const WrapperPrefix = "Doc"
+
 type Config struct {
 	SchemaMappings     []SchemaMapping
 	Capitalizations    []string
@@ -24,6 +26,7 @@ type Config struct {
 	DefaultOutputName  string
 	Warner             func(string)
 	Swagger            bool
+	Wrapper            string
 }
 
 type SchemaMapping struct {
@@ -318,7 +321,35 @@ func (g *schemaGenerator) generateRootType() error {
 	}
 
 	_, err := g.generateDeclaredType(g.schema.Type, newNameScope(rootTypeName))
+
+	if g.config.Wrapper != "" {
+		_, err = g.generateWrapperType(rootTypeName)
+	}
+
 	return err
+}
+
+func (g *schemaGenerator) generateWrapperType(root string) (codegen.Type, error) {
+	typ := schemas.Type{
+		Description: "Structure for documentation only",
+		Properties: map[string]*schemas.Type{
+			g.config.Wrapper: {Type: schemas.TypeList{schemas.TypeNameParent}, Description: "Parent struct"},
+			"body":           {Type: schemas.TypeList{schemas.TypeNameNested}, Description: "Message body"},
+			"type":           {Type: schemas.TypeList{schemas.TypeNameString}, Description: "Message type"},
+		},
+		Type: schemas.TypeList{schemas.TypeNameObject},
+		Required: []string{
+			"body",
+			"type",
+		},
+		Examples: []interface{}{
+			map[string]interface{}{
+				"type": g.schema.Comment,
+			},
+		},
+	}
+
+	return g.generateDeclaredType(&typ, newNameScope(WrapperPrefix).add(root))
 }
 
 func (g *schemaGenerator) generateReferencedType(ref string) (codegen.Type, error) {
@@ -459,7 +490,7 @@ func (g *schemaGenerator) generateDeclaredType(
 
 	g.output.file.Package.AddDecl(&decl)
 
-	if structType, ok := theType.(*codegen.StructType); ok {
+	if structType, ok := theType.(*codegen.StructType); ok && (len(scope) == 0 || scope[0] != WrapperPrefix) {
 		var validators []validator
 		for _, f := range structType.RequiredJSONFields {
 			validators = append(validators, &requiredValidator{f})
@@ -580,6 +611,8 @@ func (g *schemaGenerator) generateType(
 		return g.generateStructType(t, scope)
 	case schemas.TypeNameNull:
 		return codegen.EmptyInterfaceType{}, nil
+	case schemas.TypeNameNested:
+		return codegen.NestedType{TypeName: scope[1]}, nil
 	default:
 		return codegen.PrimitiveTypeFromJSONSchemaType(t.Type[0])
 	}
@@ -643,14 +676,16 @@ func (g *schemaGenerator) generateStructType(
 			JSONName: name,
 		}
 
-		if isRequired {
-			structField.Tags = fmt.Sprintf(`json:"%s"`, name)
-		} else {
-			structField.Tags = fmt.Sprintf(`json:"%s,omitempty"`, name)
-		}
+		if len(prop.Type) == 0 || prop.Type[0] != schemas.TypeNameParent {
+			if isRequired {
+				structField.Tags = fmt.Sprintf(`json:"%s"`, name)
+			} else {
+				structField.Tags = fmt.Sprintf(`json:"%s,omitempty"`, name)
+			}
 
-		if g.config.Swagger {
-			structField.Tags += g.addSwaggerTags(name, prop, isRequired, t.Examples)
+			if g.config.Swagger {
+				structField.Tags += g.addSwaggerTags(name, prop, isRequired, t.Examples)
+			}
 		}
 
 		if structField.Comment == "" {
