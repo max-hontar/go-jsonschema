@@ -15,7 +15,11 @@ import (
 	"github.com/max-hontar/go-jsonschema/pkg/schemas"
 )
 
-const WrapperPrefix = "Doc"
+const (
+	WrapperPrefix = "Doc"
+	WrapperDesc   = "@description The body attribute contains all the data and structure defined" +
+		" @description uniquely for the schema associated with the type attribute"
+)
 
 type Config struct {
 	SchemaMappings     []SchemaMapping
@@ -334,7 +338,7 @@ func (g *schemaGenerator) generateWrapperType(root string) (codegen.Type, error)
 		Description: "Structure for documentation only",
 		Properties: map[string]*schemas.Type{
 			g.config.Wrapper: {Type: schemas.TypeList{schemas.TypeNameParent}, Description: "Parent struct"},
-			"body":           {Type: schemas.TypeList{schemas.TypeNameNested}, Description: "Message body"},
+			"body":           {Type: schemas.TypeList{schemas.TypeNameNested}, Description: WrapperDesc},
 			"type":           {Type: schemas.TypeList{schemas.TypeNameString}, Description: "Message type"},
 		},
 		Type: schemas.TypeList{schemas.TypeNameObject},
@@ -647,6 +651,9 @@ func (g *schemaGenerator) generateStructType(
 	uniqueNames := make(map[string]int, len(t.Properties))
 
 	var structType codegen.StructType
+	if g.config.Swagger && len(scope) > 0 {
+		structType.Name = strings.Join(scope, "")
+	}
 	for _, name := range sortPropertiesByName(t.Properties) {
 		prop := t.Properties[name]
 		isRequired := requiredNames[name]

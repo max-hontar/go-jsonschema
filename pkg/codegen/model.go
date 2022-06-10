@@ -285,7 +285,9 @@ type NestedType struct {
 func (NestedType) IsNillable() bool { return true }
 
 func (n NestedType) Generate(out *Emitter) {
-	out.Print(n.TypeName)
+	out.Println("struct {")
+	out.Println(n.TypeName)
+	out.Print("} // @name " + n.TypeName)
 }
 
 type NullType struct{}
@@ -297,6 +299,7 @@ func (NullType) Generate(out *Emitter) {
 }
 
 type StructType struct {
+	Name               string
 	Fields             []StructField
 	RequiredJSONFields []string
 }
@@ -321,6 +324,9 @@ func (s *StructType) Generate(out *Emitter) {
 	}
 	out.Indent(-1)
 	out.Print("}")
+	if s.Name != "" {
+		out.Print(" // @name " + s.Name)
+	}
 }
 
 type StructField struct {
