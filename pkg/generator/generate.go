@@ -691,7 +691,11 @@ func (g *schemaGenerator) generateStructType(
 			}
 
 			if g.config.Swagger {
-				structField.Tags += g.addSwaggerTags(name, prop, isRequired, t.Examples)
+				fieldRequired := isRequired
+				if len(scope) > 0 && scope[0] == WrapperPrefix {
+					fieldRequired = false
+				}
+				structField.Tags += g.addSwaggerTags(name, prop, fieldRequired, t.Examples)
 			}
 		}
 
