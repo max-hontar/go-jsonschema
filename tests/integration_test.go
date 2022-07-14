@@ -105,20 +105,20 @@ func testExamples(t *testing.T, cfg generator.Config, dataDir string) {
 
 func testExampleFile(t *testing.T, cfg generator.Config, fileName string) {
 	t.Run(titleFromFileName(fileName), func(t *testing.T) {
-		generator, err := generator.New(cfg)
+		g, err := generator.New(cfg)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if err := generator.DoFile(fileName); err != nil {
+		if err := g.DoFile(fileName); err != nil {
 			t.Fatal(err)
 		}
 
-		if len(generator.Sources()) == 0 {
+		if len(g.Sources()) == 0 {
 			t.Fatal("Expected sources to contain something")
 		}
 
-		for outputName, source := range generator.Sources() {
+		for outputName, source := range g.Sources() {
 			if outputName == "-" {
 				outputName = strings.TrimSuffix(filepath.Base(fileName), ".json") + ".go"
 			}
@@ -147,11 +147,11 @@ func testExampleFile(t *testing.T, cfg generator.Config, fileName string) {
 
 func testFailingExampleFile(t *testing.T, cfg generator.Config, fileName string) {
 	t.Run(titleFromFileName(fileName), func(t *testing.T) {
-		generator, err := generator.New(cfg)
+		g, err := generator.New(cfg)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := generator.DoFile(fileName); err == nil {
+		if err := g.DoFile(fileName); err == nil {
 			t.Fatal("Expected test to fail")
 		}
 	})

@@ -356,7 +356,7 @@ func (g *schemaGenerator) generateWrapperType(root string) (codegen.Type, error)
 	return g.generateDeclaredType(&typ, newNameScope(WrapperPrefix).add(root))
 }
 
-func (g *schemaGenerator) generateReferencedType(ref string) (codegen.Type, error) {
+func (g *schemaGenerator) generateReferencedType(ref string, examples []interface{}) (codegen.Type, error) {
 	var fileName, scope, defName string
 	if i := strings.IndexRune(ref, '#'); i == -1 {
 		fileName = ref
@@ -404,6 +404,8 @@ func (g *schemaGenerator) generateReferencedType(ref string) (codegen.Type, erro
 			def.Type = schemas.TypeList{schemas.TypeNameObject}
 		}
 	}
+
+	def.Examples = examples
 
 	_, isCycle := g.inScope[qual]
 	if !isCycle {
@@ -590,7 +592,7 @@ func (g *schemaGenerator) generateType(
 		return g.generateEnumType(t, scope)
 	}
 	if t.Ref != "" {
-		return g.generateReferencedType(t.Ref)
+		return g.generateReferencedType(t.Ref, t.Examples)
 	}
 	if len(t.Type) == 0 {
 		return codegen.EmptyInterfaceType{}, nil
@@ -762,6 +764,7 @@ func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequ
 						if len(v) > 0 {
 							vType := fmt.Sprintf("%T", v[0])
 							if vType == fmt.Sprintf("%T", map[string]interface{}{}) {
+								prop.Items.Examples = v
 								break
 							}
 							arr := fmt.Sprint(v[0])
