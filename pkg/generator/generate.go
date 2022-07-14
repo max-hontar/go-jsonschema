@@ -738,6 +738,15 @@ func (g *schemaGenerator) addSwaggerTags(name string, prop *schemas.Type, isRequ
 		if schemaType.MinLength != 0 {
 			tags += fmt.Sprintf(` minLength:"%d"`, schemaType.MinLength)
 		}
+		if schemaType.MaxLength != 0 {
+			tags += fmt.Sprintf(` maxLength:"%d"`, schemaType.MaxLength)
+		}
+		if schemaType.Minimum != 0 {
+			tags += fmt.Sprintf(` minimum:"%v"`, schemaType.Minimum)
+		}
+		if schemaType.Maximum != 0 {
+			tags += fmt.Sprintf(` maximum:"%v"`, schemaType.Maximum)
+		}
 		if schemaType.Enum != nil {
 			var enumString string
 			for i, v := range schemaType.Enum {
