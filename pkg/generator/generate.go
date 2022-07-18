@@ -310,6 +310,15 @@ func (g *schemaGenerator) generateRootType() error {
 			}
 		}
 
+		if g.schema.Properties == nil && len(g.schema.Examples) > 0 {
+			ex := g.schema.Examples[0]
+			if exi, ok := ex.([]interface{}); ok {
+				def.Examples = exi
+			} else {
+				def.Examples = []interface{}{ex}
+			}
+		}
+
 		_, err := g.generateDeclaredType(def, newNameScope(g.identifierize(name)))
 		if err != nil {
 			return err
